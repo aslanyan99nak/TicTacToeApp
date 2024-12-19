@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AvailablePeersView: View {
   
-  @StateObject var peerManager: MultipeerManager = MultipeerManager()
+  @StateObject var peerManager: MultipeerManager
   
   var body: some View {
     List(peerManager.availablePeers, id: \.self) { peer in
@@ -40,5 +40,5 @@ struct AvailablePeersView: View {
 }
 
 #Preview {
-  AvailablePeersView()
+  AvailablePeersView(peerManager: MultipeerManager())
 }

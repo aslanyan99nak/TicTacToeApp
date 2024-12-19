@@ -19,7 +19,7 @@ class MultipeerManager: NSObject, ObservableObject {
   
   @Published var connectedPeers: [MCPeerID] = []
   @Published var availablePeers: [MCPeerID] = []
-  @Published var receivedMessages: [String] = []
+  @Published var receivedMessages: Data = Data()
   
   @Published var didReciveInvite: Bool = false
   @Published var invitationHandler: ((Bool, MCSession?) -> Void)?
@@ -67,7 +67,7 @@ extension MultipeerManager: MCSessionDelegate {
   func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
     if let message = String(data: data, encoding: .utf8) {
       DispatchQueue.main.async {
-        self.receivedMessages.append("\(peerID.displayName): \(message)")
+        self.receivedMessages = data
       }
     }
   }

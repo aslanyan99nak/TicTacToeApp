@@ -36,7 +36,7 @@ struct ContentView: View {
 
       // Add the horizontal plane anchor to the scene
       content.add(anchor)
-      content.camera = .spatialTracking
+//      content.camera = .spatialTracking
     }
     .edgesIgnoringSafeArea(.all)
   }

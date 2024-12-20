@@ -27,7 +27,7 @@ enum Positions: String {
       [.topMiddle, .middleMiddle, .bottomMiddle],
       [.topRight, .middleRight, .bottomRight],
       [.topRight, .middleMiddle, .bottomLeft],
-      [.topLeft, .middleMiddle, .middleRight],
+      [.topLeft, .middleMiddle, .bottomRight],
     ]
   }
   

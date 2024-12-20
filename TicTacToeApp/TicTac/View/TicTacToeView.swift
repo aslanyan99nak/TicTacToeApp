@@ -11,24 +11,19 @@ import RealityKit
 struct TicTacToeView: View {
   
   @StateObject var manager = MultipeerManager()
+  @StateObject var viewModel = TictacToeViewModel()
   
   @State var point: CGPoint? = nil
-  @State var turn: Turn = .X
-  @State var selectedCelles: [String] = []
-  @State var selectedPositions: [Positions : Turn] = [:]
-  @State var updatedState: GameState? = nil
-  @State var isMyTurn: Bool = true
-  @State var iswin: Winner? = nil
   @State var content: RealityViewCameraContent? = nil
   
   var body: some View {
     VStack {
-      if let iswin {
+      if let iswin = viewModel.iswin {
         HStack {
           Spacer()
           Text(iswin.rawValue)
             .font(.title)
-            .foregroundColor(iswin == .win ? .green : iswin == .draw ? .blue : .red)
+            .foregroundColor(iswin == .win ? .green : viewModel.iswin == .draw ? .blue : .red)
             .padding()
           Spacer()
           Button("Restart") {
@@ -44,8 +39,8 @@ struct TicTacToeView: View {
         .frame(height: 200)
         .onChange(of: manager.receivedMessages) { oldValue, newValue in
           guard let state = try? JSONDecoder().decode(GameState.self, from: newValue)  else { return }
-          updatedState = state
-          self.turn = Turn(rawValue: state.turn) ?? .O
+          viewModel.updatedState = state
+          viewModel.turn = Turn(rawValue: state.turn) ?? .O
         }
       
     }
@@ -60,15 +55,15 @@ extension TicTacToeView {
       drawBoard(content: content)
       content.camera = .spatialTracking
     } update: { content in
-      if iswin == nil {
+      if viewModel.iswin == nil {
         draw(content: content)
         DispatchQueue.main.async {
-          checkForWinner()
+          viewModel.checkForWinner()
         }
       }
     }
     .onTapGesture( perform: { point in
-      if isMyTurn {
+      if viewModel.isMyTurn {
         self.point = point
       }
     })
@@ -76,10 +71,10 @@ extension TicTacToeView {
   }
   
   private func draw(content: RealityViewCameraContent) {
-    if  updatedState != nil {
+    if  viewModel.updatedState != nil {
       drawUpdates(content: content)
       return
-    } else if isMyTurn {
+    } else if viewModel.isMyTurn {
       drawGestures(content: content)
       return
     }
@@ -111,7 +106,7 @@ extension TicTacToeView {
   }
   
   private func drawUpdates(content: RealityViewCameraContent) {
-    let name = updatedState?.boardState.keys.first
+    let name = viewModel.updatedState?.boardState.keys.first
     for entity in content.entities {
       guard let ent = entity.findEntity(named: name ?? "") as? ModelEntity else { continue }
       let meshEnt = MeshResource.generatePlane(width: 0.2, height: 0.2)
@@ -119,11 +114,7 @@ extension TicTacToeView {
       ent.components.set(ModelComponent(mesh: meshEnt, materials: [materialEnt]))
       drawXorO(entity: ent)
       DispatchQueue.main.async {
-        updatedState = nil
-        selectedCelles.append("\(ent.name) \(turn.rawValue)")
-        selectedPositions[(Positions(rawValue: ent.name)!)] = turn
-        turn = turn.other
-        isMyTurn = true
+        viewModel.update(ent: ent)
       }
       break
     }
@@ -136,22 +127,22 @@ extension TicTacToeView {
       guard let entity = entity as? ModelEntity else {
         continue
       }
-      if !selectedCelles.contains(entity.name) {
+      if !viewModel.selectedCelles.contains(entity.name) {
         DispatchQueue.main.async {
-          selectedCelles.append(entity.name)
-          turn = turn.other
-          selectedPositions[Positions(rawValue: entity.name)!] = turn.other
+          viewModel.selectedCelles.append(entity.name)
+          viewModel.turn = viewModel.turn.other
+          viewModel.selectedPositions[Positions(rawValue: entity.name)!] = viewModel.turn.other
         }
         let meshEnt = MeshResource.generatePlane(width: 0.2, height: 0.2)
         let materialEnt = UnlitMaterial(color: .green)
         entity.components.set(ModelComponent(mesh: meshEnt, materials: [materialEnt]))
         drawXorO(entity: entity)
         DispatchQueue.main.async {
-          let gameState = GameState(turnOwner: "", turn: turn.rawValue, boardState: [entity.name: turn.other.rawValue])
+          let gameState = GameState(turnOwner: "", turn: viewModel.turn.rawValue, boardState: [entity.name: viewModel.turn.other.rawValue])
           guard let data = try? JSONEncoder().encode(gameState) else { return }
           try? manager.session.send(data, toPeers: manager.connectedPeers, with: .reliable)
-          updatedState = nil
-          isMyTurn = false
+          viewModel.updatedState = nil
+          viewModel.isMyTurn = false
           self.point = nil
         }
       }
@@ -159,28 +150,11 @@ extension TicTacToeView {
     }
   }
   
-  private func checkForWinner() {
-    Positions.winingPosition.forEach { positions in
-      if selectedPositions.keys.contains(positions[0]) && selectedPositions.keys.contains(positions[1]) && selectedPositions.keys.contains(positions[2]) {
-        if selectedPositions[positions[0]] == selectedPositions[positions[1]] && selectedPositions[positions[1]] == selectedPositions[positions[2]] {
-          if selectedPositions[positions[0]] == Turn.X {
-            iswin = .win
-          } else {
-            iswin = .lose
-          }
-        }
-      }
-    }
-    if selectedPositions.count == 9 && iswin == nil {
-      iswin = .draw
-    }
-  }
-  
   private func drawXorO(entity: ModelEntity) {
     let xOrO = ModelEntity()
     xOrO.name = "xOrO"
-    let turnMesh = MeshResource.generateText(turn.rawValue,extrusionDepth: 0.01,font: .boldSystemFont(ofSize: 0.1),alignment: .center)
-    let turnMaterial = UnlitMaterial(color: turn == .X ? .red : .orange)
+    let turnMesh = MeshResource.generateText(viewModel.turn.rawValue,extrusionDepth: 0.01,font: .boldSystemFont(ofSize: 0.1),alignment: .center)
+    let turnMaterial = UnlitMaterial(color: viewModel.turn == .X ? .red : .orange)
     xOrO.components.set(ModelComponent(mesh: turnMesh, materials: [turnMaterial]))
     xOrO.setScale([0.5,0.5,0.5], relativeTo: entity)
     xOrO.position = [0,0,0.05]
@@ -192,15 +166,9 @@ extension TicTacToeView {
   private func restart() {
     guard let content = self.content else { return }
     content.entities.removeAll()
-    drawBoard(content: content)
-    selectedCelles.removeAll()
-    selectedPositions.removeAll()
-    iswin = nil
-    updatedState = nil
     point = nil
-    let key = "restart"
-    let data = key.data(using: .utf8)!
-    try? manager.session.send(data, toPeers: manager.connectedPeers, with: .reliable)
+    viewModel.reset()
+    drawBoard(content: content)
   }
   
 }

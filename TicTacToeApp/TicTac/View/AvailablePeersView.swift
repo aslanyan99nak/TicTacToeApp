@@ -20,7 +20,7 @@ struct AvailablePeersView: View {
       }
     }
     .alert(
-      "Received an invite from \($peerManager.invitationSender)!",
+      "Received an invite from \($peerManager.invitationSender.wrappedValue?.displayName ?? "Device")!",
       isPresented: $peerManager.didReciveInvite
     ) {
       Button("Accept invite") {

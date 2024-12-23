@@ -10,7 +10,7 @@ import RealityKit
 
 struct TicTacToeView: View {
   
-  @StateObject var manager = MultipeerManager()
+  @StateObject var manager: MultipeerManager
   @StateObject var viewModel = TictacToeViewModel()
   
   @State var point: CGPoint? = nil
@@ -42,9 +42,9 @@ struct TicTacToeView: View {
           viewModel.updatedState = state
           viewModel.turn = Turn(rawValue: state.turn) ?? .O
         }
-      
     }
   }
+  
 }
 
 extension TicTacToeView {
@@ -174,5 +174,5 @@ extension TicTacToeView {
 }
 
 #Preview {
-  TicTacToeView()
+  TicTacToeView(manager: MultipeerManager(userName: "Test"))
 }

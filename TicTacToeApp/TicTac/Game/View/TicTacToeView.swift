@@ -63,7 +63,7 @@ extension TicTacToeView {
       }
     }
     .onTapGesture( perform: { point in
-      if viewModel.isMyTurn {
+      if viewModel.isMyTurn && manager.connectedPeers.count > 0 {
         self.point = point
       }
     })
@@ -87,7 +87,7 @@ extension TicTacToeView {
         let mesh = MeshResource.generatePlane(width: 0.21, height: 0.21)
         let material = UnlitMaterial(color: .blue)
         plane.components.set(ModelComponent(mesh: mesh, materials: [material]))
-        plane.position = [Float(j)*0.22, Float(i)*0.22 - 0.5, -1]
+        plane.position = [Float(j)*0.22 - 0.25, Float(i)*0.22, -1]
         
         
         let entity = ModelEntity()

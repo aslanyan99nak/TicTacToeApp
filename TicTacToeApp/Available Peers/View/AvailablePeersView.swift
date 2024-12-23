@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-import SwiftUI
-
 struct AvailablePeersView: View {
   
   @StateObject var peerManager: MultipeerManager
@@ -16,7 +14,9 @@ struct AvailablePeersView: View {
   var body: some View {
     ZStack {
       LinearGradient(
-        gradient: Gradient(colors: [Color.blue, Color.purple]),
+        gradient: Gradient(
+          colors: [Color.blue, Color.purple]
+        ),
         startPoint: .leading,
         endPoint: .trailing
       )

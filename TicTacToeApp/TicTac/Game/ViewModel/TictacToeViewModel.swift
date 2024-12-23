@@ -52,4 +52,18 @@ final class TictacToeViewModel: ObservableObject {
     updatedState = nil
   }
   
+  func handleUpdate(newValue: Data) {
+    guard let state = try? JSONDecoder().decode(GameState.self, from: newValue)  else { return }
+    updatedState = state
+    turn = Turn(rawValue: state.turn) ?? .O
+  }
+  
+  func prepareUpdateData(entity: ModelEntity) -> Data? {
+    let gameState = GameState(turnOwner: "", turn: turn.rawValue, boardState: [entity.name: turn.other.rawValue])
+    guard let data = try? JSONEncoder().encode(gameState) else { return nil }
+    updatedState = nil
+    isMyTurn = false
+    return data
+  }
+  
 }

@@ -18,29 +18,11 @@ struct TicTacToeView: View {
   
   var body: some View {
     VStack {
-      if let iswin = viewModel.iswin {
-        HStack {
-          Spacer()
-          Text(iswin.rawValue)
-            .font(.title)
-            .foregroundColor(iswin == .win ? .green : viewModel.iswin == .draw ? .blue : .red)
-            .padding()
-          Spacer()
-          Button("Restart") {
-            restart()
-          }
-          .padding(4)
-          .background(Color.yellow)
-          .padding(6)
-        }
-      }
+      winnerInfo
       realityView
-      AvailablePeersView(peerManager: manager)
-        .frame(height: 200)
-        .onChange(of: manager.receivedMessages) { oldValue, newValue in
-          guard let state = try? JSONDecoder().decode(GameState.self, from: newValue)  else { return }
-          viewModel.updatedState = state
-          viewModel.turn = Turn(rawValue: state.turn) ?? .O
+      peers
+        .onChange(of: manager.receivedMessages) { _, newValue in
+          viewModel.handleUpdate(newValue: newValue)
         }
     }
   }
@@ -48,6 +30,31 @@ struct TicTacToeView: View {
 }
 
 extension TicTacToeView {
+  
+  @ViewBuilder
+  private var winnerInfo: some View {
+    if let iswin = viewModel.iswin {
+      HStack {
+        Spacer()
+        Text(iswin.rawValue)
+          .font(.title)
+          .foregroundColor(iswin == .win ? .green : viewModel.iswin == .draw ? .blue : .red)
+          .padding()
+        Spacer()
+        Button("Restart") {
+          restart()
+        }
+        .padding(4)
+        .background(Color.yellow)
+        .padding(6)
+      }
+    }
+  }
+  
+  private var peers: some View {
+    AvailablePeersView(peerManager: manager)
+      .frame(height: 200)
+  }
   
   private var realityView: some View {
     RealityView { content in
@@ -138,11 +145,8 @@ extension TicTacToeView {
         entity.components.set(ModelComponent(mesh: meshEnt, materials: [materialEnt]))
         drawXorO(entity: entity)
         DispatchQueue.main.async {
-          let gameState = GameState(turnOwner: "", turn: viewModel.turn.rawValue, boardState: [entity.name: viewModel.turn.other.rawValue])
-          guard let data = try? JSONEncoder().encode(gameState) else { return }
+          guard let data =  viewModel.prepareUpdateData(entity: entity) else { return }
           try? manager.session.send(data, toPeers: manager.connectedPeers, with: .reliable)
-          viewModel.updatedState = nil
-          viewModel.isMyTurn = false
           self.point = nil
         }
       }

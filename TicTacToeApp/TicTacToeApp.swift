@@ -12,8 +12,7 @@ struct TicTacToeApp: App {
 
   var body: some Scene {
     WindowGroup {
-      //      AvailablePeersView()
-      CardGameView()
+      UserNameView()
     }
   }
 

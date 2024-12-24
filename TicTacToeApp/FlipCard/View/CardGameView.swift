@@ -18,7 +18,7 @@ struct CardGameView: View {
 
   }
 
-  @State private var viewModel = CarGameViewModel()
+  @State private var viewModel = CardGameViewModel()
 
   var body: some View {
     content
@@ -30,7 +30,7 @@ extension CardGameView {
 
   private var content: some View {
     RealityView { content in
-      modelEntity = create3DCards(
+      let modelEntity = create3DCards(
         matrixType: viewModel.matrixType,
         width: viewModel.width,
         height: viewModel.height,

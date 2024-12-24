@@ -8,7 +8,7 @@
 import SwiftUI
 
 @Observable
-class CarGameViewModel {
+class CardGameViewModel {
 
   var point: CGPoint? = nil
   var width: Float = 0.5

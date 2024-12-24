@@ -33,7 +33,7 @@ struct ContentView: View {
       anchor.addChild(model)
 
       content.add(anchor)
-      content.camera = .spatialTracking
+//      content.camera = .spatialTracking
     }
     .edgesIgnoringSafeArea(.all)
   }

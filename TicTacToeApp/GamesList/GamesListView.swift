@@ -33,6 +33,10 @@ struct GamesListView: View {
             gameButton(label: "Flip Card", systemImage: "rectangle.3.group.fill")
           }
           
+          NavigationLink(destination: PuzzleView()) {
+            gameButton(label: "Puzzle", systemImage: "rectangle.3.group.fill")
+          }
+          
           Spacer()
         }
         .padding()

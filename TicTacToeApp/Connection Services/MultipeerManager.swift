@@ -12,7 +12,7 @@ import SwiftUI
 class MultipeerManager: NSObject, ObservableObject {
   
   private let serviceType = "tictacapp11"
-  var myPeerID = MCPeerID(displayName: UIDevice.current.name)
+  var myPeerID: MCPeerID
   var session: MCSession
   var advertiser: MCNearbyServiceAdvertiser
   var browser: MCNearbyServiceBrowser

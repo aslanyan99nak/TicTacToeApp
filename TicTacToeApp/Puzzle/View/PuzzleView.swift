@@ -11,17 +11,29 @@ import PhotosUI
 
 struct PuzzleView: View {
   
+  private enum SkeletonSize: Int, CaseIterable, Identifiable {
+    
+    case x3 = 3
+    case x4 = 4
+    case x5 = 5
+    
+    var id: Self { self }
+    
+  }
+  
   @State var point: CGPoint? = nil
   @State var selectedEntity: ModelEntity? = nil
   @State private var puzzleItem: PhotosPickerItem?
   @State private var puzzleImage: UIImage?
   @State private var puzzleParts: [UIImage] = []
+  @State private var skeletonSize: SkeletonSize = .x3
+  @State private var content: RealityViewCameraContent? = nil
   
   var body: some View {
     VStack {
       realityView
       puzzle
-        .frame(maxHeight: 150)
+        .frame(maxHeight: 250)
     }
   }
   
@@ -32,24 +44,10 @@ extension  PuzzleView {
   @ViewBuilder
   private var puzzle: some View {
     if puzzleParts.isEmpty {
-      PhotosPicker(selection: $puzzleItem, matching: .images) {
-        Text("Select Puzzle")
-      }
-      .onChange(of: puzzleItem) {
-        Task {
-          if let data = try? await puzzleItem?.loadTransferable(type: Data.self),
-             let uiImage = UIImage(data: data) {
-            puzzleImage = uiImage
-            puzzleParts = puzzleImage?.splitImageIntoNineParts() ?? []
-          } else {
-            print("Failed")
-          }
-        }
-      }
+      pickersView
     } else {
       puzzlePartView
     }
-    
   }
   
   private var puzzlePartView: some View {
@@ -90,11 +88,80 @@ extension  PuzzleView {
       .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
     )
     .padding(.horizontal, 10)
-    
+  }
+  
+  private var pickersView : some View {
+    ZStack {
+        LinearGradient(
+            gradient: Gradient(colors: [Color.teal.opacity(0.3), Color.purple.opacity(0.5)]),
+            startPoint: .top,
+            endPoint: .bottom
+        )
+        .ignoresSafeArea()
+
+        VStack(spacing: 40) {
+            PhotosPicker(selection: $puzzleItem, matching: .images) {
+                Text("Select Puzzle")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        LinearGradient(
+                            gradient: Gradient(colors: [Color.blue, Color.indigo]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .cornerRadius(12)
+                    .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
+            }
+
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Choose Puzzle Size")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding(.horizontal)
+
+                Picker("", selection: $skeletonSize) {
+                    ForEach(SkeletonSize.allCases, id: \.self) { skeletonSize in
+                        Text("\(skeletonSize.rawValue)x\(skeletonSize.rawValue)")
+                            .tag(skeletonSize)
+                    }
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.white.opacity(0.2))
+                )
+                .padding(.horizontal)
+            }
+        }
+        .padding()
+    }
+    .onChange(of: puzzleItem) {
+      Task {
+        if let data = try? await puzzleItem?.loadTransferable(type: Data.self),
+           let uiImage = UIImage(data: data) {
+          puzzleImage = uiImage
+          puzzleParts = puzzleImage?.splitImage(into: skeletonSize.rawValue) ?? []
+        } else {
+          print("Failed")
+        }
+      }
+    }
+    .onChange(of: skeletonSize) { oldValue, newValue in
+      guard let content else { return }
+      content.entities.removeAll()
+      drawSkeleton(content: content)
+    }
   }
   
   private var realityView: some View {
     RealityView { content in
+      self.content = content
       drawSkeleton(content: content)
       content.camera = .spatialTracking
     } update: { content in
@@ -106,8 +173,8 @@ extension  PuzzleView {
   }
   
   private func drawSkeleton(content: RealityViewCameraContent) {
-    for i in 0..<3 {
-      for j in 0..<3 {
+    for i in 0..<skeletonSize.rawValue {
+      for j in 0..<skeletonSize.rawValue {
         let plane = ModelEntity()
         let mesh = MeshResource.generatePlane(width: 0.21, height: 0.21)
         let material = UnlitMaterial(color: .blue)

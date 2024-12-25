@@ -10,7 +10,7 @@ import RealityFoundation
 
 extension UIImage {
   
-  func splitImageIntoNineParts() -> [UIImage] {
+  func splitImage(into number: Int) -> [UIImage] {
     guard let cgImage = self.cgImage else {
       print("Failed to get CGImage.")
       return []
@@ -19,13 +19,13 @@ extension UIImage {
     let width = CGFloat(cgImage.width)
     let height = CGFloat(cgImage.height)
     
-    let tileWidth = width / 3
-    let tileHeight = height / 3
+    let tileWidth = width / CGFloat(number)
+    let tileHeight = height / CGFloat(number)
     
     var images: [UIImage] = []
     
-    for row in 0..<3 {
-      for column in 0..<3 {
+    for row in 0..<number {
+      for column in 0..<number {
         let x = CGFloat(column) * tileWidth
         let y = CGFloat(row) * tileHeight
         let cropRect = CGRect(x: x, y: y, width: tileWidth, height: tileHeight)

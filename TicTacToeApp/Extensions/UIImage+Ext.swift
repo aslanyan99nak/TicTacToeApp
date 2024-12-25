@@ -27,7 +27,7 @@ extension UIImage {
     for row in 0..<number {
       for column in 0..<number {
         let x = CGFloat(column) * tileWidth
-        let y = CGFloat(row) * tileHeight
+        let y = CGFloat(number - row - 1) * tileHeight
         let cropRect = CGRect(x: x, y: y, width: tileWidth, height: tileHeight)
         
         if let croppedCgImage = cgImage.cropping(to: cropRect) {

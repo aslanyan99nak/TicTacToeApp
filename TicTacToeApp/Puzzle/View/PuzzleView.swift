@@ -14,7 +14,7 @@ struct PuzzleView: View {
   @StateObject var viewModel: PuzzleViewModel
   
   var body: some View {
-    VStack {
+    VStack(spacing: 0) {
       realityView
       puzzle
         .frame(maxHeight: 250)

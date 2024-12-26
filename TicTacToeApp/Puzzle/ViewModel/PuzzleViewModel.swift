@@ -88,8 +88,9 @@ final class PuzzleViewModel: ObservableObject {
     if let data = try? await puzzleItem?.loadTransferable(type: Data.self),
        let uiImage = UIImage(data: data) {
       DispatchQueue.main.async { [weak self] in
-        self?.puzzleImage = uiImage
-        self?.puzzleParts = self?.puzzleImage?.splitImage(into: self?.skeletonSize.rawValue ?? 0) ?? []
+        guard let self else { return }
+        puzzleImage = uiImage
+        puzzleParts = puzzleImage?.splitImage(into: skeletonSize.rawValue) ?? []
       }
     }
   }
@@ -119,14 +120,24 @@ final class PuzzleViewModel: ObservableObject {
       .sink { [weak self] value in
         guard let self else { return }
         if value.count != skeletonSize.rawValue * skeletonSize.rawValue {
-            puzzleState = "Place all pieces!"
+          puzzleState = "Place all pieces!"
         } else if value.contains(where: { $0.key != $0.value }) {
-            puzzleState = "Not Correct!"
+          puzzleState = "Not Correct!"
         } else {
-            puzzleState = "Congrats!!!"
+          puzzleState = "Congrats!!!"
+          content?.entities.forEach{ ent in
+            ent.addChild(self.animatedEntity())
+          }
         }
       }
       .store(in: &cancellables)
+  }
+  
+  private func animatedEntity() -> Entity {
+    let particles = ParticleEmitterComponent.Presets.magic
+    let model = Entity()
+    model.components.set(particles)
+    return model
   }
   
 }

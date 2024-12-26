@@ -26,7 +26,7 @@ struct GamesListView: View {
           gameButton(label: "Flip Card", systemImage: "rectangle.3.group.fill")
         }
         
-        NavigationLink(destination: PuzzleView()) {
+        NavigationLink(destination: PuzzleView(viewModel: PuzzleViewModel())) {
           gameButton(label: "Puzzle", systemImage: "rectangle.3.group.fill")
         }
         

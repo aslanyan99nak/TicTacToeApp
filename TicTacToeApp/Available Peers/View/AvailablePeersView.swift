@@ -13,14 +13,6 @@ struct AvailablePeersView: View {
   
   var body: some View {
     ZStack {
-      LinearGradient(
-        gradient: Gradient(
-          colors: [Color.blue, Color.purple]
-        ),
-        startPoint: .leading,
-        endPoint: .trailing
-      )
-      .ignoresSafeArea()
       if peerManager.availablePeers.isEmpty {
         emptyState
       } else {
@@ -31,6 +23,7 @@ struct AvailablePeersView: View {
         }
       }
     }
+    .gradientBackground()
     .alert(
       "Received an invite from \($peerManager.invitationSender.wrappedValue?.displayName ?? "Device")!",
       isPresented: $peerManager.didReciveInvite

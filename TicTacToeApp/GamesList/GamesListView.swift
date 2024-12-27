@@ -8,35 +8,32 @@
 import SwiftUI
 
 struct GamesListView: View {
+  
   var body: some View {
     NavigationStack {
-      ZStack {
-        LinearGradient(
-          gradient: Gradient(colors: [Color.cyan.opacity(0.4), Color.indigo.opacity(0.6)]),
-          startPoint: .topLeading,
-          endPoint: .bottomTrailing
-        )
-        .ignoresSafeArea()
+      VStack(spacing: 30) {
+        Text("Select a Game")
+          .font(.largeTitle)
+          .fontWeight(.bold)
+          .foregroundColor(.white)
+          .padding(.bottom, 40)
         
-        VStack(spacing: 30) {
-          Text("Select a Game")
-            .font(.largeTitle)
-            .fontWeight(.bold)
-            .foregroundColor(.white)
-            .padding(.bottom, 40)
-          
-          NavigationLink(destination: UserNameView()) {
-            gameButton(label: "Tic Tac Toe", systemImage: "circle.grid.cross")
-          }
-          
-          NavigationLink(destination: CardGameView()) {
-            gameButton(label: "Flip Card", systemImage: "rectangle.3.group.fill")
-          }
-          
-          Spacer()
+        NavigationLink(destination: UserNameView()) {
+          gameButton(label: "Tic Tac Toe", systemImage: "circle.grid.cross")
         }
-        .padding()
+        
+        NavigationLink(destination: CardGameView()) {
+          gameButton(label: "Flip Card", systemImage: "rectangle.3.group.fill")
+        }
+        
+        NavigationLink(destination: PuzzleView(viewModel: PuzzleViewModel())) {
+          gameButton(label: "Puzzle", systemImage: "rectangle.3.group.fill")
+        }
+        
+        Spacer()
       }
+      .padding()
+      .gradientBackground()
     }
   }
   
@@ -55,16 +52,9 @@ struct GamesListView: View {
       
       Spacer()
     }
-    .padding()
-    .frame(maxWidth: .infinity)
-    .background(LinearGradient(
-      gradient: Gradient(colors: [Color.blue, Color.purple]),
-      startPoint: .leading,
-      endPoint: .trailing
-    ))
-    .cornerRadius(12)
-    .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
+    .customButtonStyle()
   }
+  
 }
 
 #Preview {

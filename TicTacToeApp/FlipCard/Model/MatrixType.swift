@@ -15,14 +15,18 @@ enum MatrixType: Int, Codable, CaseIterable {
 
 }
 
-struct MatrixModel: Codable {
+struct MatrixModel: Codable, Equatable {
+  
+  static func == (lhs: MatrixModel, rhs: MatrixModel) -> Bool {
+    lhs.matrixType == rhs.matrixType && lhs.cardInfoModels == rhs.cardInfoModels
+  }
   
   var matrixType: MatrixType
   var cardInfoModels: [CardInfoModel]
   
 }
 
-struct CardInfoModel: Codable {
+struct CardInfoModel: Codable, Equatable {
   
   let cardName: String
   var isRotated: Bool

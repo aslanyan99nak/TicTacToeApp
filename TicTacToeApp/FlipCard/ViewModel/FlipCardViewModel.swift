@@ -24,6 +24,8 @@ final class FlipCardViewModel: ObservableObject, Sendable {
   @Published var updatedMatrixData: MatrixModel? = nil
   @Published var isMyTurn: Bool = true
   @Published var selectedCardModels: [CardModel] = []
+  @Published var isStarted: Bool = false
+  @Published var updateCount: Int = 0
 
   private var cancellables = Set<AnyCancellable>()
 
@@ -83,7 +85,7 @@ final class FlipCardViewModel: ObservableObject, Sendable {
         point = nil
         imageNames = []
         cardNames = []
-        updatedMatrixData = nil
+        //        updatedMatrixData = nil
         threadSafeCardModels.removeAll()
         drawMatrix(with: matrixSize)
       }
@@ -117,23 +119,9 @@ final class FlipCardViewModel: ObservableObject, Sendable {
     )
 
     let frontImageName = randomImageName()
-    let defaultImageName = "cardTexture"
-
-    let frontImage = UIImage(named: frontImageName) ?? UIImage()
-    let defaultImage = UIImage(named: defaultImageName) ?? UIImage()
-
-    let cardDefaultMaterial = createCartMaterial(from: defaultImage)
-    let frontMaterial = createCartMaterial(from: frontImage)
-
-    card.components.set(
-      ModelComponent(
-        mesh: mesh,
-        materials: [
-          cardDefaultMaterial, cardDefaultMaterial, frontMaterial, cardDefaultMaterial,
-          cardDefaultMaterial, cardDefaultMaterial,
-        ]
-      )
-    )
+    card.name = "card\(index)\(frontImageName)"
+    cardNames.append(card.name)
+    setupCardImages(card: card, mesh: mesh)
     let position = getCardPosition(
       index: index,
       matrixType: matrixType,
@@ -147,10 +135,31 @@ final class FlipCardViewModel: ObservableObject, Sendable {
       position.z
     )
     card.position = relativePosition
-    card.name = "card\(index)\(frontImageName)"
-    cardNames.append(card.name)
-    card.generateCollisionShapes(recursive: false) // Necessary for tap detection
+    //    card.transform.rotation = .init(angle: .pi, axis: .init(0, 1, 0))  //
+    card.generateCollisionShapes(recursive: false)  // Necessary for tap detection
+
     return card
+  }
+
+  private func setupCardImages(card: ModelEntity, mesh: MeshResource) {
+    guard let frontImageName = separateCardAndPhoto(from: card.name)?.1 else { return }
+    let frontImage = UIImage(named: frontImageName) ?? UIImage()
+
+    let defaultImageName = "cardTexture"
+    let defaultImage = UIImage(named: defaultImageName) ?? UIImage()
+
+    let cardDefaultMaterial = createCardMaterial(from: defaultImage)
+    let frontMaterial = createCardMaterial(from: frontImage)
+
+    card.components.set(
+      ModelComponent(
+        mesh: mesh,
+        materials: [
+          cardDefaultMaterial, cardDefaultMaterial, frontMaterial, cardDefaultMaterial,
+          cardDefaultMaterial, cardDefaultMaterial,
+        ]
+      )
+    )
   }
 
   private func randomImageName() -> String {
@@ -161,7 +170,7 @@ final class FlipCardViewModel: ObservableObject, Sendable {
     return imageName
   }
 
-  private func createCartMaterial(from image: UIImage) -> UnlitMaterial {
+  private func createCardMaterial(from image: UIImage) -> UnlitMaterial {
     guard let cgImage = image.cgImage,
       let textureResource = try? TextureResource(
         image: cgImage,
@@ -217,12 +226,80 @@ final class FlipCardViewModel: ObservableObject, Sendable {
       return
     }
   }
-  
+
   private func drawUpdates(content: RealityViewCameraContent) {
-    updatedMatrixData = nil
-    isMyTurn = true
+//    guard updateCount < 2 else { return }
+    let models = updatedMatrixData?.cardInfoModels ?? []
+    for carInfoModel in models {
+      guard !carInfoModel.cardName.isEmpty else { continue }
+      let name = carInfoModel.cardName
+      let isCardRotated = carInfoModel.isRotated
+      let isCardDeleted = carInfoModel.isDeleted
+
+      guard let cardName = separateCardAndPhoto(from: name)?.0,
+            let photoName = separateCardAndPhoto(from: name)?.1
+      else { continue }
+
+      for entity in content.entities {
+        guard
+          let card = entity.children.first(where: {
+            (separateCardAndPhoto(from: $0.name)?.0 ?? "") == cardName
+          }) as? ModelEntity
+        else { continue }
+        
+        if let cardPhotoName = separateCardAndPhoto(from: card.name)?.1,
+           cardPhotoName != photoName {
+          
+          card.name = cardName + photoName
+          let mesh =
+          card.model?.mesh
+          ?? MeshResource.generateBox(
+            width: 0,
+            height: 0,
+            depth: 0,
+            cornerRadius: 0,
+            splitFaces: true
+          )
+          setupCardImages(card: card, mesh: mesh)
+        }
+        
+        if isCardRotated {
+          let rotationValue = simd_quatf(angle: isCardRotated ? .pi : -2 * .pi, axis: [0, 1, 0])
+          card.rotateAnimation(with: rotationValue, duration: 2) { [weak self] in
+            guard let self else { return }
+//            deleteSameCards(content: content)
+          }
+        }
+      }
+    }
+    DispatchQueue.main.async { [weak self] in
+      guard let self else { return }
+      updatedMatrixData = nil
+      isMyTurn = true
+    }
   }
-  
+
+  func separateCardAndPhoto(from input: String) -> (card: String, photo: String)? {
+    let pattern = "(card\\d+)(photo\\d+)"
+
+    guard let regex = try? NSRegularExpression(pattern: pattern) else {
+      return nil
+    }
+
+    let range = NSRange(input.startIndex..<input.endIndex, in: input)
+    if let match = regex.firstMatch(in: input, options: [], range: range) {
+      let cardRange = Range(match.range(at: 1), in: input)
+      let photoRange = Range(match.range(at: 2), in: input)
+
+      if let card = cardRange.map({ String(input[$0]) }),
+        let photo = photoRange.map({ String(input[$0]) })
+      {
+        return (card, photo)
+      }
+    }
+    return nil
+  }
+
   private func drawGestures(content: RealityViewCameraContent) {
     guard let point else {
       print("no point")
@@ -235,7 +312,7 @@ final class FlipCardViewModel: ObservableObject, Sendable {
         return
       }
       //      entity.model?.materials[0] = UnlitMaterial(color: .blue)
-      
+
       cardSelected(content: content, entity: entity)
     }
   }
@@ -244,19 +321,26 @@ final class FlipCardViewModel: ObservableObject, Sendable {
     if let index = threadSafeCardModels.firstIndex(where: {
       $0.card.name == entity.name
     }) {
+      DispatchQueue.main.async { [weak self] in
+        guard let self else { return }
+        if threadSafeCardModels.count(where: { $0.isRotated }) > 1 {
+          isMyTurn.toggle()
+        }
+      }
+
       flipCardBack(content: content)
       threadSafeCardModels[index].isRotated.toggle()
       let isRotated = threadSafeCardModels[index].isRotated
-      
-//      let cardModel = threadSafeCardModels[index]
-//      if !selectedCardModels.contains(where: { $0.card.name == cardModel.card.name }) && selectedCardModels.count < 2 {
-//        selectedCardModels.append(cardModel)
-//      } else {
-//        if let index = selectedCardModels.firstIndex(where: { $0.card.name == cardModel.card.name }) {
-//          selectedCardModels.remove(at: index)
-//        }
-//      }
-      
+
+      //      let cardModel = threadSafeCardModels[index]
+      //      if !selectedCardModels.contains(where: { $0.card.name == cardModel.card.name }) && selectedCardModels.count < 2 {
+      //        selectedCardModels.append(cardModel)
+      //      } else {
+      //        if let index = selectedCardModels.firstIndex(where: { $0.card.name == cardModel.card.name }) {
+      //          selectedCardModels.remove(at: index)
+      //        }
+      //      }
+
       let rotationValue = simd_quatf(angle: isRotated ? .pi : -2 * .pi, axis: [0, 1, 0])
       entity.rotateAnimation(with: rotationValue, duration: 2) { [weak self] in
         guard let self else { return }
@@ -345,13 +429,13 @@ final class FlipCardViewModel: ObservableObject, Sendable {
   private func getMoreThanAvailableImageNames(for matrixType: MatrixType) -> [String] {
     let imageCount = matrixType.rawValue * matrixType.rawValue
     var imageNames: [String] = []
-    
+
     for index in 1..<9 {
       let imageName = "photo\(index)"
       imageNames += [imageName, imageName]
     }
     var index = 0
-    
+
     while imageNames.count < imageCount {
       let imageName = imageNames[index]
       imageNames += [imageName, imageName]
@@ -361,18 +445,21 @@ final class FlipCardViewModel: ObservableObject, Sendable {
   }
 
   func sendMatrixData(manager: MultipeerManager) {
+    updateCount += 1
     var cardInfoModels: [CardInfoModel] = []
     cardNames.forEach { cardName in
+      let isRotated = threadSafeCardModels.first(where: { $0.card.name == cardName })?.isRotated ?? false
+      
       let cardInfoModel = CardInfoModel(
         cardName: cardName,
-        isRotated: false,
+        isRotated: isRotated,
         isDeleted: false
       )
       cardInfoModels.append(cardInfoModel)
     }
-    
+
     let matrixData = MatrixModel(matrixType: matrixType, cardInfoModels: cardInfoModels)
-    
+
     DispatchQueue.main.async { [weak self] in
       guard let self else { return }
       guard let data = prepareUpdateData(matrixData: matrixData) else { return }
@@ -380,18 +467,21 @@ final class FlipCardViewModel: ObservableObject, Sendable {
       point = nil
     }
   }
-  
+
   func prepareUpdateData(matrixData: MatrixModel) -> Data? {
     guard let data = try? JSONEncoder().encode(matrixData) else { return nil }
     updatedMatrixData = nil
     isMyTurn = false
     return data
   }
-  
+
   func updateMatrixData(newValue: Data) {
-    guard let matrixData = try? JSONDecoder().decode(MatrixModel.self, from: newValue) else { return }
+    guard let matrixData = try? JSONDecoder().decode(MatrixModel.self, from: newValue) else {
+      return
+    }
     updatedMatrixData = matrixData
-    matrixType = matrixData.matrixType
+    isStarted = true
+    //    matrixType = matrixData.matrixType
   }
 
 }

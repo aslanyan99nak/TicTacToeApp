@@ -36,32 +36,72 @@ extension FlipCardGameView {
 //          }
 //        }
       }
-      .onTapGesture { point in
-        if viewModel.isMyTurn && manager.connectedPeers.count > 0 {
-          viewModel.point = point
+      .overlay {
+        VStack(spacing: 0) {
+          if !viewModel.isStarted {
+            HStack(spacing: 0) {
+              Spacer()
+              startButton
+                .padding(.trailing)
+            }
+            .frame(height: 50)
+            .padding(.top, 100)
+          }
+          Spacer()
         }
       }
-      VStack(spacing: 0) {
-        peers
-          .onChange(of: manager.receivedMessages) { _, newValue in
-            viewModel.updateMatrixData(newValue: newValue)
-          }
-          .onChange(of: manager.connectedPeers) { _, newValue in
-            if !newValue.isEmpty {
-              viewModel.sendMatrixData(manager: manager)
-            }
-          }
-          .onChange(of: viewModel.matrixType) { oldValue, newValue in
-            if oldValue != newValue {
-              viewModel.sendMatrixData(manager: manager)
-            }
-          }
-        matrixView
+      .onTapGesture { point in
+//        if viewModel.isMyTurn && manager.connectedPeers.count > 0 {
+          viewModel.point = point
+//        }
       }
-      .gradientBackground()
-      .frame(maxHeight: 200)
+      if !viewModel.isStarted {
+        gameInfoView
+      }
     }
     .edgesIgnoringSafeArea(.all)
+  }
+  
+  private var gameInfoView: some View {
+    VStack(spacing: 0) {
+      peers
+        .onChange(of: manager.receivedMessages) { _, newValue in
+          viewModel.updateMatrixData(newValue: newValue)
+        }
+//        .onChange(of: manager.connectedPeers) { _, newValue in
+//          if !newValue.isEmpty {
+//            viewModel.sendMatrixData(manager: manager)
+//          }
+//        }
+//        .onChange(of: viewModel.matrixType) { oldValue, newValue in
+//          if oldValue != newValue {
+//            viewModel.sendMatrixData(manager: manager)
+//          }
+//        }
+      if !viewModel.isStarted {
+        matrixView
+      }
+    }
+    .gradientBackground()
+    .frame(maxHeight: 200)
+  }
+  
+  private var startButton: some View {
+    Button {
+      if !manager.connectedPeers.isEmpty {
+        viewModel.isStarted = true
+        viewModel.sendMatrixData(manager: manager)
+      }
+    } label: {
+      Text("Start")
+        .foregroundStyle(Color.white)
+        .padding()
+        .gradientBackground()
+        .background(Color.secondary)
+        .clipShape(Capsule())
+        .frame(maxWidth: 100, idealHeight: 40)
+    }
+    .disabled(viewModel.isStarted || manager.connectedPeers.isEmpty)
   }
 
   private var matrixView: some View {

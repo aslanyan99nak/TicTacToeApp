@@ -40,7 +40,7 @@ final class PuzzleViewModel: ObservableObject {
   }
   
   func selectPieceOn(content: RealityViewCameraContent) {
-    guard  let point = point else {
+    guard let point = point else {
       return
     }
     let entitiesAtPoint = content.entities(at: point, in: .local)
@@ -125,7 +125,7 @@ final class PuzzleViewModel: ObservableObject {
           puzzleState = "Not Correct!"
         } else {
           puzzleState = "Congrats!!!"
-          content?.entities.forEach{ ent in
+          content?.entities.forEach { ent in
             ent.addChild(self.animatedEntity())
           }
         }

@@ -21,6 +21,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				.gitignore,
+				Utils/Synchronized.swift,
 			);
 			target = 24A30D9D2D130BEA001C5B5B /* TicTacToeVision */;
 		};

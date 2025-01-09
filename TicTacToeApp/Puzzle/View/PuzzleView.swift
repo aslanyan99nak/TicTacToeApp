@@ -101,7 +101,6 @@ extension  PuzzleView {
     }
     .padding()
     .gradientBackground()
-
   }
   
   private var realityView: some View {

@@ -9,8 +9,16 @@ import SwiftUI
 
 struct UserNameView: View {
   
+  enum GameType {
+    
+    case ticTicToe
+    case flipCard
+    
+  }
+  
   @State var name: String = ""
   @State var canNavigate: Bool = false
+  var gameType: GameType = .ticTicToe
   
   var body: some View {
     NavigationStack {
@@ -50,7 +58,10 @@ struct UserNameView: View {
         endPoint: .bottomTrailing
       ))
       .navigationDestination(isPresented: $canNavigate) {
-        TicTacToeView(manager: MultipeerManager(userName: name))
+        switch gameType {
+        case .ticTicToe: TicTacToeView(manager: MultipeerManager(userName: name))
+        case .flipCard: FlipCardGameView(manager: MultipeerManager(userName: name))
+        }
       }
     }
   }

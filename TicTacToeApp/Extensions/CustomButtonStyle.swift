@@ -53,6 +53,7 @@ extension View {
   func customButtonStyle() -> some View {
     self.modifier(CustomButtonStyle())
   }
+  
   func gradientBackground() -> some View {
     self.modifier(GradientBackgroundModifier())
   }

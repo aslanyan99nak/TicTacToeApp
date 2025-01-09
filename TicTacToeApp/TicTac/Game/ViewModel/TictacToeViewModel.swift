@@ -12,7 +12,7 @@ import RealityKit
 final class TictacToeViewModel: ObservableObject {
   
   @Published var turn: Turn = .X
-  @Published var selectedCelles: [String] = []
+  @Published var selectedCells: [String] = []
   @Published var selectedPositions: [Positions : Turn] = [:]
   @Published var updatedState: GameState? = nil
   @Published var isMyTurn: Bool = true
@@ -39,14 +39,14 @@ final class TictacToeViewModel: ObservableObject {
   
   func update(ent: ModelEntity) {
     updatedState = nil
-    selectedCelles.append("\(ent.name) \(turn.rawValue)")
+    selectedCells.append("\(ent.name) \(turn.rawValue)")
     selectedPositions[(Positions(rawValue: ent.name)!)] = turn
     turn = turn.other
     isMyTurn = true
   }
   
   func reset() {
-    selectedCelles.removeAll()
+    selectedCells.removeAll()
     selectedPositions.removeAll()
     iswin = nil
     updatedState = nil
@@ -59,7 +59,7 @@ final class TictacToeViewModel: ObservableObject {
   }
   
   func prepareUpdateData(entity: ModelEntity) -> Data? {
-    let gameState = GameState(turnOwner: "", turn: turn.rawValue, boardState: [entity.name: turn.other.rawValue])
+    let gameState = GameState(turn: turn.rawValue, boardState: [entity.name: turn.other.rawValue])
     guard let data = try? JSONEncoder().encode(gameState) else { return nil }
     updatedState = nil
     isMyTurn = false

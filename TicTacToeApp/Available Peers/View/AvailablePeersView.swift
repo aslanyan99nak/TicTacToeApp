@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct AvailablePeersView: View {
-  
+
   @StateObject var peerManager: MultipeerManager
-  
+
   var body: some View {
     ZStack {
       if peerManager.availablePeers.isEmpty {
@@ -23,7 +23,6 @@ struct AvailablePeersView: View {
         }
       }
     }
-    .gradientBackground()
     .alert(
       "Received an invite from \($peerManager.invitationSender.wrappedValue?.displayName ?? "Device")!",
       isPresented: $peerManager.didReciveInvite
@@ -35,7 +34,7 @@ struct AvailablePeersView: View {
       .padding()
       .background(Color.green)
       .cornerRadius(10)
-      
+
       Button("Reject") {
         peerManager.invitationHandler?(false, nil)
       }
@@ -45,70 +44,79 @@ struct AvailablePeersView: View {
       .cornerRadius(10)
     }
   }
-  
+
 }
 
 extension AvailablePeersView {
-  
+
   private var peersList: some View {
-    List(peerManager.availablePeers, id: \.self) { peer in
-      HStack {
-        Image(systemName: "person.fill")
-          .foregroundColor(.blue)
-          .padding(.trailing, 8)
-        Text(peer.displayName)
-          .font(.headline)
-          .foregroundColor(.primary)
-        Spacer()
-        Button(action: {
-          peerManager.browser.invitePeer(
-            peer, to: peerManager.session, withContext: nil, timeout: 30
-          )
-        }) {
-          Image(systemName: "paperplane.fill")
-            .foregroundColor(.green)
-            .padding()
+    ScrollView {
+      LazyVStack(spacing: 8) {
+        ForEach(peerManager.availablePeers, id: \.self) { peer in
+          Button {
+            peerManager.browser.invitePeer(
+              peer, to: peerManager.session, withContext: nil, timeout: 30
+            )
+          } label: {
+            HStack {
+              Image(systemName: "person.fill")
+                .foregroundColor(.blue)
+              
+              Text(peer.displayName)
+                .font(.headline)
+                .foregroundColor(.primary)
+              
+              Spacer()
+              
+              Image(systemName: "paperplane.fill")
+                .foregroundColor(.green)
+            }
+            .padding(8)
+            .background(Color.white.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .padding(8)
+          }
+          .buttonStyle(PlainButtonStyle())
         }
-        .buttonStyle(PlainButtonStyle())
       }
-      .padding(.vertical, 5)
     }
   }
-  
+
   private var emptyState: some View {
-    VStack {
+    HStack(spacing: 4) {
       Image(systemName: "wave.3.left.circle.fill")
         .resizable()
         .scaledToFit()
-        .frame(width: 100, height: 100)
+        .frame(width: 40, height: 40)
         .foregroundColor(.blue.opacity(0.7))
         .padding()
-      
+
       Text("No peers available")
-        .font(.title2)
-        .fontWeight(.semibold)
+        .font(.body)
         .foregroundColor(.secondary)
     }
   }
-  
+
   private var connectedState: some View {
-    VStack {
+    HStack {
       Image(systemName: "checkmark.circle.fill")
         .resizable()
         .scaledToFit()
-        .frame(width: 100, height: 100)
+        .frame(width: 40, height: 40)
         .foregroundColor(.green)
         .padding()
-      
-      Text("Successfully connected to \(peerManager.connectedPeers.first?.displayName ?? "a device")")
-        .font(.title2)
-        .fontWeight(.semibold)
-        .foregroundColor(.primary)
-        .multilineTextAlignment(.center)
-        .padding()
+
+      Text(
+        "Successfully connected to \(peerManager.connectedPeers.first?.displayName ?? "a device")"
+      )
+      .font(.body)
+      .foregroundColor(.primary)
+      .padding(.trailing)
+
+      Spacer()
     }
   }
-  
+
 }
 
 #Preview {

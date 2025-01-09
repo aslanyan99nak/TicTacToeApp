@@ -8,9 +8,14 @@
 import RealityKit
 import SwiftUI
 
-struct CardModel {
+struct CardModel: Sendable {
 
   var card: ModelEntity
   var isRotated: Bool
 
 }
+
+extension ModelEntity: Sendable {}
+
+extension Bool: Sendable {}
+

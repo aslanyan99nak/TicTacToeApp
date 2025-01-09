@@ -30,7 +30,7 @@ extension FlipCardGameView {
         content.camera = .spatialTracking
       } update: { content in
 //        if viewModel.isWin == nil {
-          viewModel.contentUpdated(content: content)
+        viewModel.contentUpdated(content: content, manager: manager)
 //          DispatchQueue.main.async {
 //            viewModel.checkForWinner()
 //          }

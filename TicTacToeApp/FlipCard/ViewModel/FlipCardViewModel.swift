@@ -20,12 +20,14 @@ final class FlipCardViewModel: ObservableObject, Sendable {
   @Published var spacing: Float = 0.01
   @Published var matrixType: MatrixType = .x4
   @Published var imageNames: [String] = []
-  @Published var cardNames: [String] = []
+//  @Published var cardNames: [String] = []
   @Published var updatedMatrixData: MatrixModel? = nil
   @Published var isMyTurn: Bool = true
   @Published var selectedCardModels: [CardModel] = []
   @Published var isStarted: Bool = false
   @Published var updateCount: Int = 0
+  
+//  var manager: MultipeerManager?
 
   private var cancellables = Set<AnyCancellable>()
 
@@ -84,7 +86,7 @@ final class FlipCardViewModel: ObservableObject, Sendable {
         content.entities.removeAll()
         point = nil
         imageNames = []
-        cardNames = []
+//        cardNames = []
         //        updatedMatrixData = nil
         threadSafeCardModels.removeAll()
         drawMatrix(with: matrixSize)
@@ -120,7 +122,7 @@ final class FlipCardViewModel: ObservableObject, Sendable {
 
     let frontImageName = randomImageName()
     card.name = "card\(index)\(frontImageName)"
-    cardNames.append(card.name)
+//    cardNames.append(card.name)
     setupCardImages(card: card, mesh: mesh)
     let position = getCardPosition(
       index: index,
@@ -217,12 +219,12 @@ final class FlipCardViewModel: ObservableObject, Sendable {
     return parentEntity
   }
 
-  func contentUpdated(content: RealityViewCameraContent) {
+  func contentUpdated(content: RealityViewCameraContent, manager: MultipeerManager) {
     if updatedMatrixData != nil {
       drawUpdates(content: content)
       return
     } else if isMyTurn {
-      drawGestures(content: content)
+      drawGestures(content: content, manager: manager)
       return
     }
   }
@@ -300,7 +302,7 @@ final class FlipCardViewModel: ObservableObject, Sendable {
     return nil
   }
 
-  private func drawGestures(content: RealityViewCameraContent) {
+  private func drawGestures(content: RealityViewCameraContent, manager: MultipeerManager) {
     guard let point else {
       print("no point")
       return
@@ -313,11 +315,11 @@ final class FlipCardViewModel: ObservableObject, Sendable {
       }
       //      entity.model?.materials[0] = UnlitMaterial(color: .blue)
 
-      cardSelected(content: content, entity: entity)
+      cardSelected(content: content, entity: entity, manager: manager)
     }
   }
 
-  private func cardSelected(content: RealityViewCameraContent, entity: ModelEntity) {
+  private func cardSelected(content: RealityViewCameraContent, entity: ModelEntity, manager: MultipeerManager) {
     if let index = threadSafeCardModels.firstIndex(where: {
       $0.card.name == entity.name
     }) {
@@ -331,15 +333,8 @@ final class FlipCardViewModel: ObservableObject, Sendable {
       flipCardBack(content: content)
       threadSafeCardModels[index].isRotated.toggle()
       let isRotated = threadSafeCardModels[index].isRotated
-
-      //      let cardModel = threadSafeCardModels[index]
-      //      if !selectedCardModels.contains(where: { $0.card.name == cardModel.card.name }) && selectedCardModels.count < 2 {
-      //        selectedCardModels.append(cardModel)
-      //      } else {
-      //        if let index = selectedCardModels.firstIndex(where: { $0.card.name == cardModel.card.name }) {
-      //          selectedCardModels.remove(at: index)
-      //        }
-      //      }
+      
+      sendMatrixData(manager: manager)
 
       let rotationValue = simd_quatf(angle: isRotated ? .pi : -2 * .pi, axis: [0, 1, 0])
       entity.rotateAnimation(with: rotationValue, duration: 2) { [weak self] in
@@ -445,10 +440,12 @@ final class FlipCardViewModel: ObservableObject, Sendable {
   }
 
   func sendMatrixData(manager: MultipeerManager) {
-    updateCount += 1
+//    updateCount += 1
     var cardInfoModels: [CardInfoModel] = []
-    cardNames.forEach { cardName in
-      let isRotated = threadSafeCardModels.first(where: { $0.card.name == cardName })?.isRotated ?? false
+    threadSafeCardModels.forEach { cardModel in // cardName in
+      let cardName = cardModel.card.name
+      let isRotated = cardModel.isRotated
+//      let isRotated = threadSafeCardModels.first(where: { $0.card.name == cardName })?.isRotated ?? false
       
       let cardInfoModel = CardInfoModel(
         cardName: cardName,
@@ -463,7 +460,11 @@ final class FlipCardViewModel: ObservableObject, Sendable {
     DispatchQueue.main.async { [weak self] in
       guard let self else { return }
       guard let data = prepareUpdateData(matrixData: matrixData) else { return }
-      try? manager.session.send(data, toPeers: manager.connectedPeers, with: .reliable)
+      do {
+        try manager.session.send(data, toPeers: manager.connectedPeers, with: .reliable)
+      } catch {
+        print("Can't send data to connected device Error: \(error.localizedDescription)")
+      }
       point = nil
     }
   }

@@ -1,48 +1,30 @@
 //
-//  FlipCardViewModel.swift
+//  FlipCardGameViewModel2.swift
 //  TicTacToe
 //
-//  Created by Narek Aslanyan on 19.12.24.
+//  Created by Narek Aslanyan on 10.01.25.
 //
 
-import Combine
-import RealityKit
 import SwiftUI
+import RealityKit
 
 @MainActor
-final class FlipCardViewModel: ObservableObject, Sendable {
+final class FlipCardGameViewModel2: ObservableObject, Sendable {
 
   @Synchronized var threadSafeCardModels: [CardModel] = []
-  @Published var content: RealityViewCameraContent? = nil
-  @Published var point: CGPoint? = nil
+  @Published var imageNames: [String] = []
+  @Published var matrixType: MatrixType = .x4
   @Published var width: Float = 0.5
   @Published var height: Float = 0.5
   @Published var spacing: Float = 0.01
-  @Published var matrixType: MatrixType = .x4
-  @Published var imageNames: [String] = []
-  @Published var isStarted: Bool = false
-  @Published var isWin: Bool = false
+  @Published var updatedMatrixData: MatrixModel? = nil
+  @Published var content: RealityViewCameraContent? = nil
+  @Published var point: CGPoint? = nil
 
-  func getCardPosition(
-    index: Int,
-    matrixType: MatrixType,
-    spacing: Float = 0.01,
-    width: Float = 0.1,
-    height: Float = 0.1
-  ) -> SIMD3<Float> {
-    let (row, column) = matrixRowColumn(
-      for: index,
-      in: matrixType.rawValue
-    )
-    let (postitionX, positionY) = calculatePosition(
-      row: row,
-      column: column,
-      modelHeight: width,
-      modelWidth: height,
-      spacing: spacing
-    )
-
-    return .init(x: postitionX, y: positionY, z: 0.01)
+  func prepareUpdateData(matrixData: MatrixModel) -> Data? {
+    guard let data = try? JSONEncoder().encode(matrixData) else { return nil }
+    updatedMatrixData = nil
+    return data
   }
 
   func randomImageName() -> String {
@@ -74,36 +56,28 @@ final class FlipCardViewModel: ObservableObject, Sendable {
     return nil
   }
 
-  func getImageNames(for matrixType: MatrixType) -> [String] {
-    let imageCount = matrixType.rawValue * matrixType.rawValue
+  func getCardPosition(
+    index: Int,
+    matrixType: MatrixType,
+    spacing: Float = 0.01,
+    width: Float = 0.1,
+    height: Float = 0.1
+  ) -> SIMD3<Float> {
+    let (row, column) = matrixRowColumn(
+      for: index,
+      in: matrixType.rawValue
+    )
+    let (postitionX, positionY) = calculatePosition(
+      row: row,
+      column: column,
+      modelHeight: width,
+      modelWidth: height,
+      spacing: spacing
+    )
 
-    if imageCount <= 8 {
-      return getAvailableImageNames(for: matrixType)
-    } else {
-      return getMoreThanAvailableImageNames(for: matrixType)
-    }
+    return .init(x: postitionX, y: positionY, z: 0.01)
   }
-  
-  func reset() {
-    content?.entities.removeAll()
-    threadSafeCardModels = []
-    point = nil
-    imageNames = []
-    isStarted = false
-    isWin = false
-  }
-  
-  func checkForWinner() {
-    guard !threadSafeCardModels.isEmpty else { return }
-    
-    if threadSafeCardModels.count == threadSafeCardModels.count(where: { $0.isDeleted }) {
-      DispatchQueue.main.async { [weak self] in
-        print("isWinnnnn")
-        self?.isWin = true
-      }
-    }
-  }
-  
+
   private func matrixRowColumn(for index: Int, in gridSize: Int) -> (Int, Int) {
     guard index >= 0 && index < gridSize * gridSize else {
       fatalError("Index out of bounds for the given grid size")
@@ -124,6 +98,16 @@ final class FlipCardViewModel: ObservableObject, Sendable {
     let horizontalOffset: Float = (modelWidth + spacing) * Float(column)
     let verticalOffset: Float = (modelHeight + spacing) * Float(row)
     return (horizontalOffset, verticalOffset)
+  }
+
+  func getImageNames(for matrixType: MatrixType) -> [String] {
+    let imageCount = matrixType.rawValue * matrixType.rawValue
+
+    if imageCount <= 8 {
+      return getAvailableImageNames(for: matrixType)
+    } else {
+      return getMoreThanAvailableImageNames(for: matrixType)
+    }
   }
 
   private func getAvailableImageNames(for matrixType: MatrixType) -> [String] {
@@ -158,4 +142,40 @@ final class FlipCardViewModel: ObservableObject, Sendable {
     return imageNames
   }
 
+  func updateMatrixData(newValue: Data) {
+    guard let matrixData = try? JSONDecoder().decode(MatrixModel.self, from: newValue) else {
+      return
+    }
+    updatedMatrixData = matrixData
+  }
+  
+  func sendMatrixData(manager: MultipeerManager) {
+    var cardInfoModels: [CardInfoModel] = []
+    threadSafeCardModels.forEach { cardModel in
+      let cardName = cardModel.card.name
+      let isRotated = cardModel.isRotated
+
+      let cardInfoModel = CardInfoModel(
+        cardName: cardName,
+        isRotated: isRotated,
+        isDeleted: false
+      )
+      cardInfoModels.append(cardInfoModel)
+    }
+
+    let matrixData = MatrixModel(matrixType: matrixType, cardInfoModels: cardInfoModels)
+
+    DispatchQueue.main.async { [weak self] in
+      guard let self else { return }
+      guard let data = prepareUpdateData(matrixData: matrixData) else { return }
+      do {
+        try manager.session.send(data, toPeers: manager.connectedPeers, with: .reliable)
+      } catch {
+        print("Can't send data to connected device Error: \(error.localizedDescription)")
+      }
+      point = nil
+    }
+  }
+
+  
 }

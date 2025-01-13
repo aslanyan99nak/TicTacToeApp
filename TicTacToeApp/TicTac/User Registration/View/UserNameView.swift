@@ -14,6 +14,13 @@ struct UserNameView: View {
     case ticTicToe
     case flipCard
     
+    var gameName: String {
+      switch self {
+      case .ticTicToe: "TicTacToe"
+      case .flipCard: "FlipCard"
+      }
+    }
+    
   }
   
   @State var name: String = ""
@@ -24,7 +31,7 @@ struct UserNameView: View {
     NavigationStack {
       VStack {
         Spacer()
-        Text("Welcome!")
+        Text("Welcome \(gameType.gameName)!")
           .font(.largeTitle)
           .fontWeight(.bold)
           .foregroundColor(.white)
@@ -60,7 +67,7 @@ struct UserNameView: View {
       .navigationDestination(isPresented: $canNavigate) {
         switch gameType {
         case .ticTicToe: TicTacToeView(manager: MultipeerManager(userName: name))
-        case .flipCard: FlipCardGameView(manager: MultipeerManager(userName: name))
+        case .flipCard: FlipCardGameView2(manager: MultipeerManager(userName: name))
         }
       }
     }

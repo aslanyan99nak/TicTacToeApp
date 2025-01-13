@@ -66,8 +66,11 @@ extension MultipeerManager: MCSessionDelegate {
     peer peerID: MCPeerID,
     didChange state: MCSessionState
   ) {
-    DispatchQueue.main.async {
+    DispatchQueue.main.async { [weak self] in
+      guard let self else { return }
       self.connectedPeers = session.connectedPeers
+      advertiser.stopAdvertisingPeer()
+      browser.stopBrowsingForPeers()
     }
   }
 

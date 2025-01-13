@@ -10,14 +10,22 @@ import SwiftUI
 
 extension Entity {
 
-  func rotateAnimation(with value: simd_quatf, duration: CGFloat) {
+  func rotateAnimation(
+    with value: simd_quatf,
+    duration: CGFloat,
+    completion: @escaping () -> Void = {}
+  ) {
     var currentTransform = transform
     currentTransform.rotation = value
-    move(to: currentTransform, relativeTo: self.parent, duration: duration)
+    let playBack = move(to: currentTransform, relativeTo: self.parent, duration: duration)
     
-    print("SelfTransform: \(currentTransform.rotation) \n CurrentTransform: \(currentTransform.rotation)")
+    DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+      if !playBack.isPlaying {
+        completion()
+      }
+    }
   }
-  
+
   func rotateAnimation(from: Transform, to: simd_quatf, duration: CGFloat) {
     var currentTransform = from
     currentTransform.rotation = to

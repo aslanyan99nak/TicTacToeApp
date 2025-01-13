@@ -6,15 +6,49 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		24A30DA32D130BEA001C5B5B /* RealityKitContent in Frameworks */ = {isa = PBXBuildFile; productRef = 24A30DA22D130BEA001C5B5B /* RealityKitContent */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		240E25462D116A060077C31C /* TicTacToe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TicTacToe.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		2437D3FB2D129FF30033C728 /* TicTacToe-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "TicTacToe-Info.plist"; sourceTree = "<group>"; };
+		24A30D9E2D130BEA001C5B5B /* TicTacToeVision.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TicTacToeVision.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		24A30DA12D130BEA001C5B5B /* RealityKitContent */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = RealityKitContent; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		245FAEF32D13154F00D4A3EA /* Exceptions for "TicTacToeApp" folder in "TicTacToeVision" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				.gitignore,
+				Utils/Synchronized.swift,
+			);
+			target = 24A30D9D2D130BEA001C5B5B /* TicTacToeVision */;
+		};
+		24A30DAE2D130BED001C5B5B /* Exceptions for "TicTacToeVision" folder in "TicTacToeVision" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 24A30D9D2D130BEA001C5B5B /* TicTacToeVision */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		240E25482D116A060077C31C /* TicTacToeApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				245FAEF32D13154F00D4A3EA /* Exceptions for "TicTacToeApp" folder in "TicTacToeVision" target */,
+			);
 			path = TicTacToeApp;
+			sourceTree = "<group>";
+		};
+		24A30D9F2D130BEA001C5B5B /* TicTacToeVision */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				24A30DAE2D130BED001C5B5B /* Exceptions for "TicTacToeVision" folder in "TicTacToeVision" target */,
+			);
+			path = TicTacToeVision;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -27,14 +61,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		24A30D9B2D130BEA001C5B5B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				24A30DA32D130BEA001C5B5B /* RealityKitContent in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		240E253D2D116A060077C31C = {
 			isa = PBXGroup;
 			children = (
-				2437D3FB2D129FF30033C728 /* TicTacToe-Info.plist */,
 				240E25482D116A060077C31C /* TicTacToeApp */,
+				24A30D9F2D130BEA001C5B5B /* TicTacToeVision */,
+				24A30DA02D130BEA001C5B5B /* Packages */,
 				240E25472D116A060077C31C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -43,8 +86,17 @@
 			isa = PBXGroup;
 			children = (
 				240E25462D116A060077C31C /* TicTacToe.app */,
+				24A30D9E2D130BEA001C5B5B /* TicTacToeVision.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		24A30DA02D130BEA001C5B5B /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				24A30DA12D130BEA001C5B5B /* RealityKitContent */,
+			);
+			path = Packages;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -72,6 +124,29 @@
 			productReference = 240E25462D116A060077C31C /* TicTacToe.app */;
 			productType = "com.apple.product-type.application";
 		};
+		24A30D9D2D130BEA001C5B5B /* TicTacToeVision */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 24A30DAF2D130BED001C5B5B /* Build configuration list for PBXNativeTarget "TicTacToeVision" */;
+			buildPhases = (
+				24A30D9A2D130BEA001C5B5B /* Sources */,
+				24A30D9B2D130BEA001C5B5B /* Frameworks */,
+				24A30D9C2D130BEA001C5B5B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				24A30D9F2D130BEA001C5B5B /* TicTacToeVision */,
+			);
+			name = TicTacToeVision;
+			packageProductDependencies = (
+				24A30DA22D130BEA001C5B5B /* RealityKitContent */,
+			);
+			productName = TicTacToeVision;
+			productReference = 24A30D9E2D130BEA001C5B5B /* TicTacToeVision.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -83,6 +158,9 @@
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					240E25452D116A060077C31C = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					24A30D9D2D130BEA001C5B5B = {
 						CreatedOnToolsVersion = 16.2;
 					};
 				};
@@ -102,6 +180,7 @@
 			projectRoot = "";
 			targets = (
 				240E25452D116A060077C31C /* TicTacToe */,
+				24A30D9D2D130BEA001C5B5B /* TicTacToeVision */,
 			);
 		};
 /* End PBXProject section */
@@ -114,10 +193,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		24A30D9C2D130BEA001C5B5B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		240E25422D116A060077C31C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		24A30D9A2D130BEA001C5B5B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -254,7 +347,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"TicTacToeApp/Preview Content\"";
-				DEVELOPMENT_TEAM = W6NNYLPY8M;
+				DEVELOPMENT_TEAM = 75J3TY68PB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "TicTacToe-Info.plist";
@@ -262,6 +355,7 @@
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "We need access to Bluetooth for peer-to-peer connections.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "We need access to the local network for peer-to-peer connections.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arkit;
@@ -274,15 +368,15 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.nak.RealityKitAppp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nak.RealityKitApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -294,7 +388,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"TicTacToeApp/Preview Content\"";
-				DEVELOPMENT_TEAM = W6NNYLPY8M;
+				DEVELOPMENT_TEAM = 75J3TY68PB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "TicTacToe-Info.plist";
@@ -302,6 +396,7 @@
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "We need access to Bluetooth for peer-to-peer connections.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "We need access to the local network for peer-to-peer connections.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arkit;
@@ -314,15 +409,71 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.nak.RealityKitAppp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nak.RealityKitApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		24A30DB02D130BED001C5B5B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"TicTacToeVision/Preview Content\"";
+				DEVELOPMENT_TEAM = 75J3TY68PB;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "$(TARGET_NAME)/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nak.TicTacToeVision;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = xros;
+				SUPPORTED_PLATFORMS = "xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 7;
+				XROS_DEPLOYMENT_TARGET = 2.2;
+			};
+			name = Debug;
+		};
+		24A30DB12D130BED001C5B5B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"TicTacToeVision/Preview Content\"";
+				DEVELOPMENT_TEAM = 75J3TY68PB;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "$(TARGET_NAME)/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nak.TicTacToeVision;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = xros;
+				SUPPORTED_PLATFORMS = "xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 7;
+				XROS_DEPLOYMENT_TARGET = 2.2;
 			};
 			name = Release;
 		};
@@ -347,7 +498,23 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		24A30DAF2D130BED001C5B5B /* Build configuration list for PBXNativeTarget "TicTacToeVision" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				24A30DB02D130BED001C5B5B /* Debug */,
+				24A30DB12D130BED001C5B5B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		24A30DA22D130BEA001C5B5B /* RealityKitContent */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = RealityKitContent;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 240E253E2D116A060077C31C /* Project object */;
 }

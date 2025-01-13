@@ -9,14 +9,29 @@ import SwiftUI
 
 struct UserNameView: View {
   
+  enum GameType {
+    
+    case ticTicToe
+    case flipCard
+    
+    var gameName: String {
+      switch self {
+      case .ticTicToe: "TicTacToe"
+      case .flipCard: "FlipCard"
+      }
+    }
+    
+  }
+  
   @State var name: String = ""
   @State var canNavigate: Bool = false
+  var gameType: GameType = .ticTicToe
   
   var body: some View {
     NavigationStack {
       VStack {
         Spacer()
-        Text("Welcome!")
+        Text("Welcome \(gameType.gameName)!")
           .font(.largeTitle)
           .fontWeight(.bold)
           .foregroundColor(.white)
@@ -50,7 +65,10 @@ struct UserNameView: View {
         endPoint: .bottomTrailing
       ))
       .navigationDestination(isPresented: $canNavigate) {
-        TicTacToeView(manager: MultipeerManager(userName: name))
+        switch gameType {
+        case .ticTicToe: TicTacToeView(manager: MultipeerManager(userName: name))
+        case .flipCard: FlipCardGameView2(manager: MultipeerManager(userName: name))
+        }
       }
     }
   }

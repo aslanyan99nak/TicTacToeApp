@@ -1,5 +1,5 @@
 //
-//  CardGameView.swift
+//  FlipCardGameView.swift
 //  TicTacToe
 //
 //  Created by Narek Aslanyan on 18.12.24.

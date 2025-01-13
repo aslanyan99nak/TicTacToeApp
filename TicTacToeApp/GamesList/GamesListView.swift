@@ -22,7 +22,7 @@ struct GamesListView: View {
           gameButton(label: "Tic Tac Toe", systemImage: "circle.grid.cross")
         }
         
-        NavigationLink(destination: CardGameView()) {
+        NavigationLink(destination: FlipCardGameView()) {
           gameButton(label: "Flip Card", systemImage: "rectangle.3.group.fill")
         }
         

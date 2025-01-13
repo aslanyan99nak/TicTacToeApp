@@ -11,6 +11,12 @@ import SwiftUI
 struct CardModel {
 
   var card: ModelEntity
-  var isRotated: Bool
+  var isRotated: Bool = false
+  var isDeleted: Bool = false
 
 }
+
+extension ModelEntity: Sendable {}
+
+extension Bool: Sendable {}
+

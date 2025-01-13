@@ -6,12 +6,10 @@
 //
 
 import Foundation
-import MultipeerConnectivity
 
 struct GameState: Codable {
-  
-  let turnOwner: String
+
   let turn: String
-  let boardState: [String : String]
-  
+  let boardState: [String: String]
+
 }

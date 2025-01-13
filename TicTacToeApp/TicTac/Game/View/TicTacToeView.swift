@@ -139,6 +139,7 @@ extension TicTacToeView {
           viewModel.selectedCelles.append(entity.name)
           viewModel.turn = viewModel.turn.other
           viewModel.selectedPositions[Positions(rawValue: entity.name)!] = viewModel.turn.other
+          viewModel.mySign = viewModel.turn.other
         }
         let meshEnt = MeshResource.generatePlane(width: 0.2, height: 0.2)
         let materialEnt = UnlitMaterial(color: .green)

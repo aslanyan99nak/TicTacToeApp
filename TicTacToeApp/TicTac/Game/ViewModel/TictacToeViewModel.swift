@@ -17,6 +17,7 @@ final class TictacToeViewModel: ObservableObject {
   @Published var updatedState: GameState? = nil
   @Published var isMyTurn: Bool = true
   @Published var iswin: Winner? = nil
+  @Published var mySign: Turn? = nil
   
   func checkForWinner() {
     Positions.winingPosition.forEach { positions in
@@ -24,7 +25,7 @@ final class TictacToeViewModel: ObservableObject {
           selectedPositions.keys.contains(positions[1]) &&
           selectedPositions.keys.contains(positions[2]) {
         if selectedPositions[positions[0]] == selectedPositions[positions[1]] && selectedPositions[positions[1]] == selectedPositions[positions[2]] {
-          if selectedPositions[positions[0]] == Turn.X {
+          if selectedPositions[positions[0]] == mySign {
             iswin = .win
           } else {
             iswin = .lose

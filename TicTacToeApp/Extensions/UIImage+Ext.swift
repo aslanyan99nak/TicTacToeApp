@@ -11,7 +11,8 @@ import RealityFoundation
 extension UIImage {
   
   func splitImage(into number: Int) -> [UIImage] {
-    guard let cgImage = self.cgImage else {
+    guard let normalizedImage = self.normalized(),
+          let cgImage = normalizedImage.cgImage else {
       print("Failed to get CGImage.")
       return []
     }
@@ -57,6 +58,21 @@ extension UIImage {
       texture: .init(textureResource)
     )
     return material
+  }
+  
+}
+
+extension UIImage {
+  
+  func normalized() -> UIImage? {
+    if imageOrientation == .up {
+      return self
+    }
+    UIGraphicsBeginImageContextWithOptions(size, false, scale)
+    draw(in: CGRect(origin: .zero, size: size))
+    let normalizedImage = UIGraphicsGetImageFromCurrentImageContext()
+    UIGraphicsEndImageContext()
+    return normalizedImage
   }
   
 }

@@ -85,36 +85,9 @@ extension FlipCardGameView {
   @ViewBuilder
   private var winnerInfo: some View {
     if viewModel.isWin {
-      VStack(spacing: 0) {
-        Spacer()
-        
-        Text("You Win 🎉")
-          .font(.title)
-          .fontWeight(.bold)
-          .foregroundColor(.white)
-          .padding()
-        
-        Spacer()
-        
-        Button {
-          redraw()
-        } label: {
-          Text("Restart")
-            .font(.title)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 16)
-            .background(Color.yellow)
-            .clipShape(Capsule())
-        }
-        
-        Spacer()
+      WinnerInfoView(title: "You Win 🎉") {
+        redraw()
       }
-      .padding()
-      .gradientBackground()
-      .background(.purple.opacity(0.5))
-      .frame(height: 200)
-      .clipShape(RoundedRectangle(cornerRadius: 12))
-      .padding(.horizontal, 24)
     }
   }
 

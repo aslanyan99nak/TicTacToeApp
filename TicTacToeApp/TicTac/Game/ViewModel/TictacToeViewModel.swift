@@ -16,7 +16,7 @@ final class TictacToeViewModel: ObservableObject {
   @Published var selectedPositions: [Positions : Turn] = [:]
   @Published var updatedState: GameState? = nil
   @Published var isMyTurn: Bool = true
-  @Published var iswin: Winner? = nil
+  @Published var isWin: Winner? = nil
   @Published var mySign: Turn? = nil
   
   func checkForWinner() {
@@ -26,15 +26,15 @@ final class TictacToeViewModel: ObservableObject {
           selectedPositions.keys.contains(positions[2]) {
         if selectedPositions[positions[0]] == selectedPositions[positions[1]] && selectedPositions[positions[1]] == selectedPositions[positions[2]] {
           if selectedPositions[positions[0]] == mySign {
-            iswin = .win
+            isWin = .win
           } else {
-            iswin = .lose
+            isWin = .lose
           }
         }
       }
     }
-    if selectedPositions.count == 9 && iswin == nil {
-      iswin = .draw
+    if selectedPositions.count == 9 && isWin == nil {
+      isWin = .draw
     }
   }
   
@@ -49,7 +49,7 @@ final class TictacToeViewModel: ObservableObject {
   func reset() {
     selectedCells.removeAll()
     selectedPositions.removeAll()
-    iswin = nil
+    isWin = nil
     updatedState = nil
   }
   
@@ -60,7 +60,7 @@ final class TictacToeViewModel: ObservableObject {
   }
   
   func prepareUpdateData(entity: ModelEntity) -> Data? {
-    let gameState = GameState(turn: turn.rawValue, boardState: [entity.name: turn.other.rawValue])
+    let gameState = GameState(turn: turn.other.rawValue, boardState: [entity.name: turn.rawValue])
     guard let data = try? JSONEncoder().encode(gameState) else { return nil }
     updatedState = nil
     isMyTurn = false

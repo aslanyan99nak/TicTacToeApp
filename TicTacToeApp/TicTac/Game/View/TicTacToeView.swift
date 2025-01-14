@@ -18,12 +18,15 @@ struct TicTacToeView: View {
 
   var body: some View {
     VStack {
-      winnerInfo
       realityView
       peers
         .onChange(of: manager.receivedMessages) { _, newValue in
           viewModel.handleUpdate(newValue: newValue)
         }
+    }
+    .blur(radius: viewModel.isWin != nil ? 5 : 0)
+    .overlay {
+      winnerInfo
     }
   }
 
@@ -33,20 +36,9 @@ extension TicTacToeView {
 
   @ViewBuilder
   private var winnerInfo: some View {
-    if let iswin = viewModel.iswin {
-      HStack {
-        Spacer()
-        Text(iswin.rawValue)
-          .font(.title)
-          .foregroundColor(iswin == .win ? .green : viewModel.iswin == .draw ? .blue : .red)
-          .padding()
-        Spacer()
-        Button("Restart") {
-          restart()
-        }
-        .padding(4)
-        .background(Color.yellow)
-        .padding(6)
+    if let iswin = viewModel.isWin {
+      WinnerInfoView(title: iswin.rawValue) {
+        restart()
       }
     }
   }
@@ -54,7 +46,7 @@ extension TicTacToeView {
   private var peers: some View {
     AvailablePeersView(peerManager: manager)
       .gradientBackground()
-      .frame(height: 200)
+      .frame(height: 100)
   }
 
   private var realityView: some View {
@@ -63,7 +55,7 @@ extension TicTacToeView {
       drawBoard(content: content)
       content.camera = .spatialTracking
     } update: { content in
-      if viewModel.iswin == nil {
+      if viewModel.isWin == nil {
         draw(content: content)
         DispatchQueue.main.async {
           viewModel.checkForWinner()
